@@ -1,0 +1,208 @@
+-- // Midzzy Hub V3 - Ciano Edition //
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local cam = workspace.CurrentCamera
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+-- Criar GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "MidzzyHubV3"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+gui.IgnoreGuiInset = true
+
+-- Painel principal (ciano escuro de fundo)
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 320, 0, 320)
+frame.Position = UDim2.new(0.5, -160, 0.5, -160)
+frame.BackgroundColor3 = Color3.fromRGB(10, 40, 60) -- fundo ciano escuro
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+local frameCorner = Instance.new("UICorner", frame)
+frameCorner.CornerRadius = UDim.new(0.07, 0)
+
+-- Bordas neon ciano
+local uiStroke = Instance.new("UIStroke", frame)
+uiStroke.Thickness = 3
+uiStroke.Color = Color3.fromRGB(0, 255, 255)
+
+-- Glow externo ciano
+local glow = Instance.new("Frame", gui)
+glow.ZIndex = frame.ZIndex - 1
+glow.AnchorPoint = Vector2.new(0.5, 0.5)
+glow.Size = UDim2.new(0, 380, 0, 380)
+glow.Position = UDim2.new(0.5, -160, 0.5, -160)
+glow.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+local glowCorner = Instance.new("UICorner", glow)
+glowCorner.CornerRadius = UDim.new(0.12, 0)
+local grad = Instance.new("UIGradient", glow)
+grad.Rotation = 90
+grad.Transparency = NumberSequence.new{
+	NumberSequenceKeypoint.new(0,0.85),
+	NumberSequenceKeypoint.new(0.5,0.95),
+	NumberSequenceKeypoint.new(1,1)
+}
+glow.ZIndex = 0
+frame.ZIndex = 1
+
+-- Título
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, -20, 0, 50)
+title.Position = UDim2.new(0, 10, 0, 8)
+title.BackgroundTransparency = 1
+title.Text = "⚡ MIDZZY HUB V3 ⚡"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.TextColor3 = Color3.fromRGB(0, 255, 255)
+title.TextScaled = true
+title.TextWrapped = true
+
+-- Container botões
+local btnContainer = Instance.new("Frame", frame)
+btnContainer.Size = UDim2.new(1, -20, 1, -80)
+btnContainer.Position = UDim2.new(0, 10, 0, 70)
+btnContainer.BackgroundTransparency = 1
+
+-- Criar botões ciano
+local function criarBotao(nome, posY)
+	local b = Instance.new("TextButton", btnContainer)
+	b.Size = UDim2.new(0.92, 0, 0, 46)
+	b.Position = UDim2.new(0.04, 0, 0, posY)
+	b.BackgroundColor3 = Color3.fromRGB(0, 180, 180)
+	b.AutoButtonColor = false
+	b.Text = nome
+	b.Font = Enum.Font.GothamSemibold
+	b.TextColor3 = Color3.fromRGB(230, 255, 255)
+	b.TextSize = 16
+	local c = Instance.new("UICorner", b); c.CornerRadius = UDim.new(0.18, 0)
+	local glowStroke = Instance.new("UIStroke", b)
+	glowStroke.Thickness = 2
+	glowStroke.Color = Color3.fromRGB(0, 255, 255)
+	-- hover
+	b.MouseEnter:Connect(function()
+		TweenService:Create(b, TweenInfo.new(0.18), {BackgroundColor3 = Color3.fromRGB(0, 220, 220)}):Play()
+	end)
+	b.MouseLeave:Connect(function()
+		TweenService:Create(b, TweenInfo.new(0.18), {BackgroundColor3 = Color3.fromRGB(0, 180, 180)}):Play()
+	end)
+	return b
+end
+
+-- Botões
+local btnFloat = criarBotao("🚀 Float Teleguiado", 0)
+local btnFPS = criarBotao("⚙️ FPS Boost Ultra", 60)
+local btnAnti = criarBotao("🛡️ Anti Rejoin", 120)
+local btnKick = criarBotao("🚪 Kick (Me)", 180)
+
+-- Minimizar (ciano)
+local bola = Instance.new("TextButton", gui)
+bola.Size = UDim2.new(0, 50, 0, 50)
+bola.Position = UDim2.new(0.08, 0, 0.82, 0)
+bola.BackgroundColor3 = Color3.fromRGB(0, 180, 180)
+bola.Text = "MZ"
+bola.TextColor3 = Color3.fromRGB(255, 255, 255)
+bola.Font = Enum.Font.GothamBold
+bola.TextSize = 18
+bola.Visible = false
+bola.Draggable = true
+Instance.new("UICorner", bola).CornerRadius = UDim.new(1, 0)
+local bolaGlow = Instance.new("UIStroke", bola)
+bolaGlow.Thickness = 2
+bolaGlow.Color = Color3.fromRGB(0, 255, 255)
+
+local minimizar = Instance.new("TextButton", frame)
+minimizar.Text = "—"
+minimizar.Size = UDim2.new(0, 28, 0, 28)
+minimizar.Position = UDim2.new(1, -42, 0, 10)
+minimizar.BackgroundColor3 = Color3.fromRGB(0, 200, 200)
+minimizar.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizar.Font = Enum.Font.GothamBold
+minimizar.TextSize = 18
+Instance.new("UICorner", minimizar).CornerRadius = UDim.new(1, 0)
+
+minimizar.MouseButton1Click:Connect(function()
+	frame.Visible = false
+	bola.Visible = true
+end)
+bola.MouseButton1Click:Connect(function()
+	frame.Visible = true
+	bola.Visible = false
+end)
+
+-- Função pegar HRP
+local function getHRP()
+	local char = player.Character
+	if not char then return nil end
+	return char:FindFirstChild("HumanoidRootPart")
+end
+
+-- Float Teleguiado (ciano edition, velocidade reduzida)
+local floatActive = false
+local floatConn
+btnFloat.MouseButton1Click:Connect(function()
+	floatActive = not floatActive
+	if floatActive then
+		btnFloat.Text = "🛑 Parar Float"
+		floatConn = RunService.RenderStepped:Connect(function()
+			local hrp = getHRP()
+			if hrp and cam then
+				local dir = cam.CFrame.LookVector
+				hrp.Velocity = dir * 20 + Vector3.new(0, 2, 0)
+			end
+		end)
+	else
+		btnFloat.Text = "🚀 Float Teleguiado"
+		if floatConn then floatConn:Disconnect(); floatConn = nil end
+		local hrp = getHRP()
+		if hrp then hrp.Velocity = Vector3.zero end
+	end
+end)
+
+-- FPS Boost
+btnFPS.MouseButton1Click:Connect(function()
+	pcall(function()
+		for _, obj in pairs(workspace:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				obj.Material = Enum.Material.SmoothPlastic
+				obj.Reflectance = 0
+			elseif obj:IsA("Decal") or obj:IsA("Texture") then
+				obj.Transparency = 1
+			elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") then
+				obj.Enabled = false
+			elseif obj:IsA("Light") then
+				obj.Enabled = false
+			end
+		end
+		settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+		game:GetService("Lighting").GlobalShadows = false
+		game:GetService("Lighting").FogEnd = 9e9
+		game:GetService("Lighting").Brightness = 1
+		btnFPS.Text = "✅ FPS Boost Ativado!"
+		task.delay(1.7, function() btnFPS.Text = "⚙️ FPS Boost Ultra" end)
+	end)
+end)
+
+-- Anti Rejoin
+local antiRejoin = false
+btnAnti.MouseButton1Click:Connect(function()
+	antiRejoin = not antiRejoin
+	if antiRejoin then
+		btnAnti.Text = "🛡️ Anti Rejoin: ON"
+		getgenv().AntiRejoinActive = true
+	else
+		btnAnti.Text = "🛡️ Anti Rejoin"
+		getgenv().AntiRejoinActive = false
+	end
+end)
+
+-- Kick
+btnKick.MouseButton1Click:Connect(function()
+	player:Kick("VOCE ROUBOU UM TROXA 🤣🤷‍♂️")
+end)
+
+-- Cleanup
+player.CharacterRemoving:Connect(function()
+	if floatConn then floatConn:Disconnect(); floatConn = nil end
+end)
